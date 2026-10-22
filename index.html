@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WA Keluarga - Private</title>
+<style>
+body{background:#0a0a0a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding:20px}
+.card{background:#151515;border:1px solid #222;border-radius:20px;padding:24px;max-width:400px;width:100%;text-align:center}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;margin:10px 0}
+button{width:100%;padding:14px;border-radius:12px;background:#fff;color:#000;font-weight:800;border:none}
+.item{background:#1e1e1e;padding:12px;border-radius:12px;display:flex;justify-content:space-between;margin:8px 0;border:1px solid #222;text-align:left}
+.item a{color:#25D366;text-decoration:none;font-weight:800}
+#list{display:none}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>🔒 Daftar WA Keluarga</h2>
+<div id="login">
+<input type="password" id="pass" placeholder="Masukkan sandi">
+<button onclick="buka()">Buka</button>
+<p id="err" style="color:#ff4444;font-size:13px;margin-top:8px"></p>
+</div>
+<div id="list"></div>
+</div>
+<script>
+// KODE ACAK - NOMOR ASLI TIDAK KELIATAN DISINI
+const DATA_ACAK = "PggBAB1CX1NQUEdTQEVUWVRrMR0fFFRTEVFTXFlDUUJVVFdQQll4OgQaAgwBHg5RTFBfVF1cVUdZRlA=";
+
+function buka(){
+ let pass=document.getElementById('pass').value;
+ try{
+  // decode base64
+  let bin = atob(DATA_ACAK);
+  let dec = "";
+  for(let i=0;i<bin.length;i++){
+    dec += String.fromCharCode(bin.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
+  }
+  if(!dec.includes('|')) throw "salah";
+  let lines = dec.split('\n');
+  let html="";
+  lines.forEach(l=>{
+    let p=l.split('|');
+    if(p.length==2) html+=`<div class="item"><span>${p[0]}</span><a href="https://wa.me/${p[1].replace(/^0/,'62')}" target="_blank">Chat ↗</a></div>`;
+  });
+  document.getElementById('login').style.display='none';
+  document.getElementById('list').style.display='block';
+  document.getElementById('list').innerHTML = html + `<button onclick="location.reload()" style="margin-top:15px;background:#222;color:#fff;border:1px solid #333">Kunci Lagi</button>`;
+ }catch(e){
+  document.getElementById('err').innerText="Sandi salah bung!";
+ }
+}
+</script>
+</body>
+</html>
