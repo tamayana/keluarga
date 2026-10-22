@@ -1,68 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WA Keluarga - Private</title>
 <style>
-body{background:#0a0a0a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding:20px}
-.card{background:#151515;border:1px solid #222;border-radius:20px;padding:24px;max-width:400px;width:100%;text-align:center}
-input{width:100%;padding:14px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;margin:10px 0;box-sizing:border-box}
-button{width:100%;padding:14px;border-radius:12px;background:#fff;color:#000;font-weight:800;border:none}
-.item{background:#1e1e1e;padding:14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin:8px 0;border:1px solid #222;text-align:left}
-.item a{color:#25D366;text-decoration:none;font-weight:800;background:#113322;padding:6px 12px;border-radius:8px}
-#list{display:none}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{background:#070708;color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:16px}
+.card{width:100%;max-width:420px;background:rgba(20,20,22,0.9);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:28px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.icon{width:44px;height:44px;background:#fff;color:#000;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:900}
+h1{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.sub{font-size:13px;color:#888;margin-top:2px}
+.input{width:100%;padding:16px 18px;border-radius:14px;border:1px solid #222;background:#121214;color:#fff;font-size:16px;outline:none;margin-bottom:12px}
+.input:focus{border-color:#333}
+.btn{width:100%;padding:16px;border-radius:14px;background:#fff;color:#000;font-weight:800;font-size:15px;border:none;cursor:pointer}
+.btn:active{transform:scale(0.98)}
+.err{color:#ff4d4d;font-size:13px;margin-top:12px;min-height:18px;text-align:center}
+.list{display:none}
+.item{display:flex;justify-content:space-between;align-items:center;background:#121214;border:1px solid #1e1e20;border-radius:18px;padding:16px;margin-bottom:12px}
+.info b{font-size:15px;display:block}
+.info small{color:#888;font-size:13px;margin-top:4px;display:block;letter-spacing:0.5px}
+.wa{background:#1a3d1f;border:1px solid #245a2a;color:#22c55e;text-decoration:none;font-weight:800;padding:10px 16px;border-radius:12px;font-size:13px}
+.wa:active{transform:scale(0.95)}
+.lock{margin-top:16px;background:#121214;color:#888;border:1px solid #222}
 </style>
 </head>
 <body>
 <div class="card">
-<h2>🔒 Daftar WA Keluarga</h2>
+<div class="head"><div class="icon">🔒</div><div><h1>Daftar WA Keluarga</h1><div class="sub">Private • Butuh sandi</div></div></div>
+
 <div id="login">
-<input type="password" id="pass" placeholder="Masukkan sandi">
-<button onclick="buka()">Buka Daftar</button>
-<p id="err" style="color:#ff4444;font-size:13px;margin-top:8px"></p>
+<input id="pass" class="input" type="password" placeholder="Masukkan sandi keluarga">
+<button class="btn" onclick="buka()">Buka Daftar</button>
+<div id="err" class="err"></div>
 </div>
-<div id="list"></div>
+
+<div id="list" class="list"></div>
 </div>
+
 <script>
+// DATA ACAK - NOMOR ASLI TIDAK KELIATAN DI VIEW SOURCE
 const DATA_ACAK = "PggBAB1CX1NQUEdTQEVUWVRrMR0fFFRTEVFTXFlDUUJVVFdQQll4OgQaAgwBHg5RTFBfVF1cVUdZRlA=";
 
-function b64decodeManual(s){
-  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  const map={}; for(let i=0;i<chars.length;i++) map[chars[i]]=i;
-  s=s.replace(/=+$/,"");
-  let out=[], bits=0, bitCount=0;
-  for(let c of s){ if(!(c in map)) continue; bits=(bits<<6)|map[c]; bitCount+=6; if(bitCount>=8){ bitCount-=8; out.push((bits>>bitCount)&255); bits&= (1<<bitCount)-1; } }
-  return out;
+function b64decode(s){
+  const C="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  const M={}; for(let i=0;i<C.length;i++) M[C[i]]=i;
+  s=s.replace(/=+$/,""); let o=[], b=0, bc=0;
+  for(let ch of s){ if(!(ch in M)) continue; b=(b<<6)|M[ch]; bc+=6; if(bc>=8){ bc-=8; o.push((b>>bc)&255); b&= (1<<bc)-1; } }
+  return o;
 }
 
 function buka(){
- let pass=document.getElementById('pass').value;
- try{
-  let raw = b64decodeManual(DATA_ACAK);
-  let dec="";
-  for(let i=0;i<raw.length;i++){
-    dec+=String.fromCharCode(raw[i] ^ pass.charCodeAt(i % pass.length));
+  const pass=document.getElementById('pass').value;
+  const err=document.getElementById('err');
+  if(!pass){ err.textContent="Masukin sandi dulu bung!"; return; }
+  try{
+    const raw=b64decode(DATA_ACAK);
+    let txt=""; for(let i=0;i<raw.length;i++){ txt+=String.fromCharCode(raw[i] ^ pass.charCodeAt(i % pass.length)); }
+    if(!txt.includes('|') || !txt.includes('0822')) throw "salah";
+    const lines=txt.trim().split('\n');
+    let html="";
+    lines.forEach(line=>{
+      const parts=line.split('|'); if(parts.length<2) return;
+      const nama=parts[0].trim(); const nomor=parts[1].trim();
+      const wa=nomor.replace(/^0/,'62');
+      html+=`<div class="item"><div class="info"><b>${nama}</b><small>${nomor}</small></div><a class="wa" href="https://wa.me/${wa}" target="_blank">Chat ↗</a></div>`;
+    });
+    document.getElementById('login').style.display='none';
+    const list=document.getElementById('list'); list.style.display='block';
+    list.innerHTML=html+`<button class="btn lock" onclick="location.reload()">🔒 Kunci Lagi</button>`;
+  }catch(e){
+    err.textContent="Sandi salah!";
   }
-  if(!dec.includes('|') || !dec.includes('Ummu')) throw "salah";
-  let lines=dec.trim().split('\n');
-  let html="";
-  lines.forEach(l=>{
-    let p=l.split('|');
-    if(p.length>=2){
-      let nama=p[0].trim();
-      let nomor=p[1].trim();
-      let waLink = nomor.replace(/^0/,'62');
-      html+=`<div class="item"><span>${nama}<br><small style="color:#888">${nomor}</small></span><a href="https://wa.me/${waLink}" target="_blank">Chat ↗</a></div>`;
-    }
-  });
-  document.getElementById('login').style.display='none';
-  let listDiv=document.getElementById('list');
-  listDiv.style.display='block';
-  listDiv.innerHTML=html+`<button onclick="location.reload()" style="margin-top:15px;background:#222;color:#fff;border:1px solid #333">🔒 Kunci Lagi</button>`;
- }catch(e){
-  document.getElementById('err').innerText="Sandi salah bung! Coba: keluargabesarrahmadpratama";
- }
 }
+document.getElementById('pass').addEventListener('keydown',e=>{ if(e.key==='Enter') buka(); });
 </script>
 </body>
 </html>
