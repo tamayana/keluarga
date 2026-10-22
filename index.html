@@ -6,10 +6,10 @@
 <style>
 body{background:#0a0a0a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;padding:20px}
 .card{background:#151515;border:1px solid #222;border-radius:20px;padding:24px;max-width:400px;width:100%;text-align:center}
-input{width:100%;padding:14px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;margin:10px 0}
+input{width:100%;padding:14px;border-radius:12px;border:1px solid #333;background:#222;color:#fff;margin:10px 0;box-sizing:border-box}
 button{width:100%;padding:14px;border-radius:12px;background:#fff;color:#000;font-weight:800;border:none}
-.item{background:#1e1e1e;padding:12px;border-radius:12px;display:flex;justify-content:space-between;margin:8px 0;border:1px solid #222;text-align:left}
-.item a{color:#25D366;text-decoration:none;font-weight:800}
+.item{background:#1e1e1e;padding:14px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin:8px 0;border:1px solid #222;text-align:left}
+.item a{color:#25D366;text-decoration:none;font-weight:800;background:#113322;padding:6px 12px;border-radius:8px}
 #list{display:none}
 </style>
 </head>
@@ -18,36 +18,49 @@ button{width:100%;padding:14px;border-radius:12px;background:#fff;color:#000;fon
 <h2>🔒 Daftar WA Keluarga</h2>
 <div id="login">
 <input type="password" id="pass" placeholder="Masukkan sandi">
-<button onclick="buka()">Buka</button>
+<button onclick="buka()">Buka Daftar</button>
 <p id="err" style="color:#ff4444;font-size:13px;margin-top:8px"></p>
 </div>
 <div id="list"></div>
 </div>
 <script>
-// KODE ACAK - NOMOR ASLI TIDAK KELIATAN DISINI
 const DATA_ACAK = "PggBAB1CX1NQUEdTQEVUWVRrMR0fFFRTEVFTXFlDUUJVVFdQQll4OgQaAgwBHg5RTFBfVF1cVUdZRlA=";
+
+function b64decodeManual(s){
+  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  const map={}; for(let i=0;i<chars.length;i++) map[chars[i]]=i;
+  s=s.replace(/=+$/,"");
+  let out=[], bits=0, bitCount=0;
+  for(let c of s){ if(!(c in map)) continue; bits=(bits<<6)|map[c]; bitCount+=6; if(bitCount>=8){ bitCount-=8; out.push((bits>>bitCount)&255); bits&= (1<<bitCount)-1; } }
+  return out;
+}
 
 function buka(){
  let pass=document.getElementById('pass').value;
  try{
-  // decode base64
-  let bin = atob(DATA_ACAK);
-  let dec = "";
-  for(let i=0;i<bin.length;i++){
-    dec += String.fromCharCode(bin.charCodeAt(i) ^ pass.charCodeAt(i % pass.length));
+  let raw = b64decodeManual(DATA_ACAK);
+  let dec="";
+  for(let i=0;i<raw.length;i++){
+    dec+=String.fromCharCode(raw[i] ^ pass.charCodeAt(i % pass.length));
   }
-  if(!dec.includes('|')) throw "salah";
-  let lines = dec.split('\n');
+  if(!dec.includes('|') || !dec.includes('Ummu')) throw "salah";
+  let lines=dec.trim().split('\n');
   let html="";
   lines.forEach(l=>{
     let p=l.split('|');
-    if(p.length==2) html+=`<div class="item"><span>${p[0]}</span><a href="https://wa.me/${p[1].replace(/^0/,'62')}" target="_blank">Chat ↗</a></div>`;
+    if(p.length>=2){
+      let nama=p[0].trim();
+      let nomor=p[1].trim();
+      let waLink = nomor.replace(/^0/,'62');
+      html+=`<div class="item"><span>${nama}<br><small style="color:#888">${nomor}</small></span><a href="https://wa.me/${waLink}" target="_blank">Chat ↗</a></div>`;
+    }
   });
   document.getElementById('login').style.display='none';
-  document.getElementById('list').style.display='block';
-  document.getElementById('list').innerHTML = html + `<button onclick="location.reload()" style="margin-top:15px;background:#222;color:#fff;border:1px solid #333">Kunci Lagi</button>`;
+  let listDiv=document.getElementById('list');
+  listDiv.style.display='block';
+  listDiv.innerHTML=html+`<button onclick="location.reload()" style="margin-top:15px;background:#222;color:#fff;border:1px solid #333">🔒 Kunci Lagi</button>`;
  }catch(e){
-  document.getElementById('err').innerText="Sandi salah bung!";
+  document.getElementById('err').innerText="Sandi salah bung! Coba: keluargabesarrahmadpratama";
  }
 }
 </script>
